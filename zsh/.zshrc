@@ -32,13 +32,6 @@ zstyle ':fzf-tab:complete:(cd|z):*' fzf-preview 'ls --color=always -1 $realpath'
 source <(fzf --zsh)
 
 # ------------------------------------------------------------
-# Keybindings & Line Editing (Fixes Ctrl+A and Ctrl+E)
-# ------------------------------------------------------------
-bindkey -e
-bindkey '^A' beginning-of-line
-bindkey '^E' end-of-line
-
-# ------------------------------------------------------------
 # CLI Integrations
 # ------------------------------------------------------------
 eval "$(zoxide init zsh)"
@@ -62,3 +55,13 @@ alias gcd="git checkout"
 alias gbd="git branch -d"
 alias gbD="git branch -D"
 alias gdiff="git diff"
+
+# ------------------------------------------------------------
+# Keybindings & Line Editing (Fixes Ctrl+A and Ctrl+E)
+# ------------------------------------------------------------
+# Force Emacs keymap
+bindkey -e
+
+# Explicitly ensure Ctrl+A and Ctrl+E are bound
+bindkey '^A' beginning-of-line
+bindkey '^E' end-of-line
