@@ -1,0 +1,10 @@
+default_search = "google"
+
+[user_bindings]
+# Static shortcut (e.g., 'cal' jumps to Google Calendar)
+cal = "https://calendar.google.com"
+
+# Parametric shortcut ('{}' gets replaced with whatever query you type)
+gh = "https://github.com/search?q={}"
+yt = "https://www.youtube.com/results?search_query={}"
+map = "https://www.google.com/maps/search/{}"
