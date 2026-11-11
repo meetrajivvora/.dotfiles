@@ -8,10 +8,8 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME=""
 
 # Oh My Zsh Plugins
-# Note: fzf-tab must be loaded before zsh-autosuggestions and zsh-syntax-highlighting
 plugins=(
   git
-  fzf-tab
   zsh-autosuggestions
   zsh-syntax-highlighting
 )
@@ -19,17 +17,18 @@ plugins=(
 source "$ZSH/oh-my-zsh.sh"
 
 # ------------------------------------------------------------
-# Completion Styles & fzf-tab Configuration
+# Completion Styles
 # ------------------------------------------------------------
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '[%d]'
-zstyle ':fzf-tab:*' switch-group ',' '.'
-zstyle ':fzf-tab:complete:(cd|z):*' fzf-preview 'ls --color=always -1 $realpath'
 
 # fzf keybindings & fuzzy completion
 source <(fzf --zsh)
+# Restore Tab to zsh's built-in completion menu (OMZ's compinit).
+# `source <(fzf --zsh)` binds ^I to fzf-completion; this overrides it.
+bindkey '^I' expand-or-complete
 
 # ------------------------------------------------------------
 # CLI Integrations
