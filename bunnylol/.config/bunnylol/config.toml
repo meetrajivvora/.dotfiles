@@ -59,6 +59,7 @@ steamdb = { url = "https://steamdb.info/search/?a=all&q={}" }
 # Command history settings
 ui = {url = "http://localhost:8001/", description = "bunnylol config UI", aliases = ["configui", "bunnyui"], override = true}
 drive = {url = "https://drive.google.com", aliases = ["gdrive"], override = true}
+etsy = {url = "https://etsy.com/"}
 [history]
 enabled = true
 max_entries = 1000
