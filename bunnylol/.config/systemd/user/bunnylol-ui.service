@@ -1,0 +1,15 @@
+[Unit]
+Description=bunnylol config web UI
+After=network.target
+
+[Service]
+Type=simple
+Environment=BUNNYLOL_CONFIG=%h/.dotfiles/bunnylol/.config/bunnylol/config.toml
+Environment=BUNNYLOL_UI_HOST=127.0.0.1
+Environment=BUNNYLOL_UI_PORT=8001
+ExecStart=%h/.local/share/bunnylol-ui/venv/bin/python %h/.local/bin/bunnylol-ui
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
