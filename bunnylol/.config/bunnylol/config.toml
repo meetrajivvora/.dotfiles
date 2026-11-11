@@ -59,6 +59,7 @@ steamdb = { url = "https://steamdb.info/search/?a=all&q={}" }
 # Command history settings
 yahoo = {url = "https://www.yahoo.com/"}
 ui = {url = "http://localhost:8001/", description = "bunnylol config UI", aliases = ["configui", "bunnyui"], override = true}
+drive = {url = "https://drive.google.com", aliases = ["gdrive"], override = true}
 [history]
 enabled = true
 max_entries = 1000
