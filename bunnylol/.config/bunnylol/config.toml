@@ -1,10 +1,77 @@
+# Bunnylol Configuration File
+# https://github.com/facebook/bunnylol.rs
+#
+# NOTE: The CLI reads this file on each run. The server reloads it when the
+#       file's modified time changes.
+#
+# SHORTCUT NOT WORKING? Check this symlink first:
+#   /etc/bunnylol/config.toml -> ~/.dotfiles/bunnylol/.config/bunnylol/config.toml
+#   bunnylol reads /etc/bunnylol/config.toml FIRST and ignores this file if /etc
+#   is a regular file instead of this symlink (an OS update can replace it with
+#   the stock default). Verify with: readlink /etc/bunnylol/config.toml
+#   If broken, restore it:
+#     sudo mv /etc/bunnylol/config.toml /etc/bunnylol/config.toml.stock
+#     sudo ln -s /home/meetrajivvora/.dotfiles/bunnylol/.config/bunnylol/config.toml /etc/bunnylol/config.toml
+#   Stock default kept at /etc/bunnylol/config.toml.stock
+
+# Browser to open URLs in (optional)
+# Examples: "firefox", "chrome", "chromium", "safari"
+# If not set, uses the OS default browser
+# browser = "firefox"
+
+# Default search engine when command not recognized
+# Options: "google" (default), "ddg", "bing"
 default_search = "google"
 
-[user_bindings]
-# Static shortcut (e.g., 'cal' jumps to Google Calendar)
-cal = "https://calendar.google.com"
+# Stock website provider
+# Options: "yahoo" (default), "finviz", "tradingview", "google", "investing"
+stock_provider = "google"
 
-# Parametric shortcut ('{}' gets replaced with whatever query you type)
-gh = "https://github.com/search?q={}"
-yt = "https://www.youtube.com/results?search_query={}"
-map = "https://www.google.com/maps/search/{}"
+# User-defined bindings. Two variants, both as inline tables:
+#
+#   # URL binding: maps a name to a URL (use {} as a placeholder for args).
+#   cal  = { url = "https://calendar.google.com/calendar/u/1/r" }
+#   jira = { url = "https://corp.atlassian.net/browse/{}", description = "Jira ticket" }
+#
+#   # Command binding: rewrites the input to another bunnylol command.
+#   work = { command = "gh mycompany/repo", description = "Work repo" }
+#
+# By default, built-in commands win on a name collision. Add `override = true`
+# to a binding to shadow a built-in (e.g. `gh = { command = "...", override = true }`).
+#
+# Note: Command bindings do not forward extra args ({} is URL-only) and never
+# recurse into other user bindings (dispatch once into the registry).
+[user_bindings]
+cal = { url = "https://calendar.google.com/calendar/u/1/r", aliases = ["c"] }
+gemini = { url = "https://gemini.google.com/app", aliases = ["gem"], override = true }
+wa = { url = "https://web.whatsapp.com", override = true }
+"$" = { command = "$META" }
+caedrel = { url = "https://www.youtube.com/@Caedrel/videos" }
+geogrid = { url = "https://www.geogridgame.com/" }
+openrouter = { url = "https://openrouter.ai/workspaces/default/activity" }
+
+fidelity = { url = "https://digital.fidelity.com/ftgw/digital/portfolio/summary" }
+netbenefits = { url = "https://workplaceservices.fidelity.com/mybenefits/navstation/navigation#/", aliases = ["401k"] }
+robinhood = { url = "https://robinhood.com", aliases = ["rh"] }
+
+steamdb = { url = "https://steamdb.info/search/?a=all&q={}" }
+
+# Command history settings
+[history]
+enabled = true
+max_entries = 1000
+
+# Server configuration (for bunnylol serve)
+# server_display_url: Public-facing URL shown in the bindings page
+#   Smart defaults when protocol is omitted:
+#     - "bunny.example.com" → "https://bunny.example.com"
+#     - "localhost" or "127.0.0.1" or "0.0.0.0" → "http://localhost" (or IP)
+#   You can also specify the full URL:
+#     - "https://bunny.example.com" → used as-is
+#     - "http://bunny.local" → used as-is
+#   If not set, defaults to http://localhost:{port}
+[server]
+port = 8000
+address = "127.0.0.1"
+log_level = "normal"
+# server_display_url = "bunny.example.com"
