@@ -12,6 +12,7 @@ import fcntl
 import json
 import os
 import re
+import subprocess
 import tempfile
 from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -220,6 +221,30 @@ def delete_binding(name: str) -> None:
         write_doc(doc)
 
 
+def commit_bindings() -> str:
+    repo = subprocess.run(
+        ["git", "-C", str(CONFIG_PATH.parent), "rev-parse", "--show-toplevel"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    cfg = str(CONFIG_PATH.resolve())
+    status = subprocess.run(
+        ["git", "-C", repo, "status", "--porcelain", "--", cfg],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    if not status:
+        return "no changes to commit"
+    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+    subprocess.run(
+        ["git", "-C", repo, "add", "--", cfg],
+        capture_output=True, text=True, check=True, env=env,
+    )
+    subprocess.run(
+        ["git", "-C", repo, "commit", "-m", "bunnylol: update bindings", "--only", "--", cfg],
+        capture_output=True, text=True, check=True, env=env,
+    )
+    return "committed"
+
+
 PAGE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -252,7 +277,7 @@ PAGE = """<!DOCTYPE html>
   <label for="aliases">Aliases</label><input id="aliases" placeholder="comma,separated">
   <label for="override">Override</label><input id="override" type="checkbox">
   <div></div>
-  <div><button type="submit" id="save">Save</button> <button type="button" id="cancel">Reset</button></div>
+  <div><button type="submit" id="save">Save</button> <button type="button" id="cancel">Reset</button> <button type="button" id="commit">Commit</button></div>
 </form>
 <div id="status"></div>
 
@@ -356,6 +381,12 @@ async function remove(name) {
 
 form.addEventListener('submit', save);
 document.getElementById('cancel').onclick = reset;
+document.getElementById('commit').onclick = async () => {
+  const res = await fetch('/api/commit', {method: 'POST'});
+  const data = await res.json().catch(() => ({}));
+  if (res.ok) { setStatus(data.result || 'Committed'); }
+  else { setStatus(data.error || 'commit failed'); }
+};
 load();
 </script>
 </body>
@@ -436,6 +467,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.origin_ok():
             self.send_json(403, {"error": "forbidden origin"})
+            return
+        if self.path == "/api/commit":
+            try:
+                self.require_symlink()
+                result = commit_bindings()
+                self.send_json(200, {"ok": True, "result": result})
+            except Exception as exc:
+                self.send_json(400, {"error": str(exc)})
             return
         if self.path != "/api/bindings":
             self.send_json(404, {"error": "not found"})
