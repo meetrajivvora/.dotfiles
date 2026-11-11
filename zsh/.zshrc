@@ -64,3 +64,7 @@ bindkey -e
 # Explicitly ensure Ctrl+A and Ctrl+E are bound
 bindkey '^A' beginning-of-line
 bindkey '^E' end-of-line
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/meetrajivvora/.local/bin:$PATH"
