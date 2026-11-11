@@ -227,13 +227,27 @@ def commit_bindings() -> str:
         capture_output=True, text=True, check=True,
     ).stdout.strip()
     cfg = str(CONFIG_PATH.resolve())
+    env = {
+        **os.environ,
+        "GIT_TERMINAL_PROMPT": "0",
+        "GIT_SSH_COMMAND": "ssh -o BatchMode=yes",
+    }
     status = subprocess.run(
         ["git", "-C", repo, "status", "--porcelain", "--", cfg],
         capture_output=True, text=True, check=True,
     ).stdout.strip()
     if not status:
-        return "no changes to commit"
-    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
+        ahead = subprocess.run(
+            ["git", "-C", repo, "rev-list", "--count", "@{u}..HEAD"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        if ahead == "0":
+            return "nothing to commit or push"
+        subprocess.run(
+            ["git", "-C", repo, "push"],
+            capture_output=True, text=True, check=True, env=env,
+        )
+        return "pushed existing commits"
     subprocess.run(
         ["git", "-C", repo, "add", "--", cfg],
         capture_output=True, text=True, check=True, env=env,
@@ -242,7 +256,11 @@ def commit_bindings() -> str:
         ["git", "-C", repo, "commit", "-m", "bunnylol: update bindings", "--only", "--", cfg],
         capture_output=True, text=True, check=True, env=env,
     )
-    return "committed"
+    subprocess.run(
+        ["git", "-C", repo, "push"],
+        capture_output=True, text=True, check=True, env=env,
+    )
+    return "committed and pushed"
 
 
 PAGE = """<!DOCTYPE html>
@@ -277,7 +295,7 @@ PAGE = """<!DOCTYPE html>
   <label for="aliases">Aliases</label><input id="aliases" placeholder="comma,separated">
   <label for="override">Override</label><input id="override" type="checkbox">
   <div></div>
-  <div><button type="submit" id="save">Save</button> <button type="button" id="cancel">Reset</button> <button type="button" id="commit">Commit</button></div>
+  <div><button type="submit" id="save">Save</button> <button type="button" id="cancel">Reset</button> <button type="button" id="commit">Commit &amp; Push</button></div>
 </form>
 <div id="status"></div>
 
