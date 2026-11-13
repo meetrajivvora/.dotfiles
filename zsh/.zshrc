@@ -11,8 +11,18 @@ ZSH_THEME=""
 plugins=(
   git
   zsh-autosuggestions
+  zsh-you-should-use
   zsh-syntax-highlighting
 )
+
+# Custom plugins (install once per machine):
+#   git clone https://github.com/zsh-users/zsh-completions \
+#     ~/.oh-my-zsh/custom/plugins/zsh-completions
+#   git clone https://github.com/MichaelAquilina/zsh-you-should-use \
+#     ~/.oh-my-zsh/custom/plugins/zsh-you-should-use
+# zsh-completions: add its src to fpath before OMZ runs compinit.
+# (Do not add it to plugins; the plugin's fpath line would run after compinit.)
+fpath+=("$ZSH/custom/plugins/zsh-completions/src")
 
 source "$ZSH/oh-my-zsh.sh"
 
